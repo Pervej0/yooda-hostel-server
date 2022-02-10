@@ -22,7 +22,7 @@ const run = async () => {
     const database = client.db("Yooda_Hostel");
     const foodListCollection = database.collection("foodList");
     const studentListCollection = database.collection("studentList");
-    const serveListCollection = database.collection("serveList");
+    // const serveListCollection = database.collection("serveList");
 
     // insert a food item
     app.post("/foodlist", async (req, res) => {
