@@ -20,56 +20,7 @@ const run = async () => {
   try {
     await client.connect();
     const database = client.db("Yooda_Hostel");
-    const foodListCollection = database.collection("foodList");
     const studentListCollection = database.collection("studentList");
-    // const serveListCollection = database.collection("serveList");
-
-    // insert a food item
-    app.post("/foodlist", async (req, res) => {
-      const data = req.body;
-      const result = await foodListCollection.insertOne(data);
-      res.json(result);
-    });
-
-    // get all foods
-    app.get("/foodlist", async (req, res) => {
-      const cursor = foodListCollection.find({});
-      const page = req.query.currentPage;
-      const size = parseInt(req.query.perPageItem);
-      let products;
-      const count = await cursor.count();
-      if (page) {
-        products = await cursor
-          .skip(page * size)
-          .limit(size)
-          .toArray();
-      } else {
-        products = await cursor.toArray();
-      }
-
-      res.send({
-        count,
-        products,
-      });
-    });
-
-    // update a food item
-    app.put("/foodlist/:id", async (req, res) => {
-      const id = req.params.id;
-      const data = req.body;
-      const filter = { _id: ObjectId(id) };
-      const updateDoc = { $set: data };
-      const result = await foodListCollection.updateOne(filter, updateDoc);
-      res.json(result);
-    });
-
-    // Delete a food item
-    app.delete("/foodlist/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await foodListCollection.deleteOne(query);
-      res.json(result);
-    });
 
     // insert a student
     app.post("/studentlist", async (req, res) => {
@@ -122,17 +73,19 @@ const run = async () => {
     // get student details by roll
     app.get("/studentlist/:extra", async (req, res) => {
       const paramsData = req.params.extra;
-      const checkType = req.query.type;
+      const checkType = JSON.parse(req.query.type);
       let filter = {};
-
-      if (checkType.length === 8) {
-        filter.shift = paramsData;
+      if (checkType === "studentName") {
+        filter.fullName = paramsData;
       }
-      if (checkType.length === 6) {
-        filter.roll = paramsData;
+      if (checkType === "school") {
+        filter.school = paramsData;
       }
-      if (checkType.length === 11) {
-        filter.date = paramsData;
+      if (checkType === "studentClass") {
+        filter.class = paramsData;
+      }
+      if (checkType === "division") {
+        filter.division = paramsData;
       }
       const data = await studentListCollection.find(filter).toArray();
       res.send(data);
